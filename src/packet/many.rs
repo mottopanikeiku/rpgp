@@ -309,6 +309,20 @@ mod tests {
     }
 
     #[test]
+    fn partial_packet_write_len() {
+        let armor = include_bytes!(
+            "../../tests/unit-tests/partial-body-length/literal.packet-partial.512.asc"
+        );
+        let reader = crate::armor::Dearmor::new(&armor[..]);
+        let packet = PacketParser::new(BufReader::new(reader))
+            .next()
+            .unwrap()
+            .unwrap();
+
+        assert_eq!(packet.write_len(), packet.to_bytes().unwrap().len());
+    }
+
+    #[test]
     fn test_partial_length_encoding() {
         let _ = pretty_env_logger::try_init();
 

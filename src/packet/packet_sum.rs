@@ -161,9 +161,13 @@ pub trait PacketTrait: Serialize {
 
     /// Length in bytes used when calling `to_writer_with_header`.
     fn write_len_with_header(&self) -> usize {
-        let mut sum = self.packet_header().write_len();
-        sum += self.write_len();
-        sum
+        let body_len = self.write_len();
+        let header = self.packet_header();
+        let header_len = match header.packet_length().maybe_len() {
+            Some(_) => header.version().header_len(body_len),
+            None => header.write_len(),
+        };
+        header_len + body_len
     }
 }
 
